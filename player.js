@@ -5,6 +5,8 @@ class Player {
     this.size = 32;
     this.speed = 3;
     this.type = "boy";
+
+    this.nearBuilding = null; // ✅ ADD THIS
   }
 
   setCharacter(type) {
@@ -26,11 +28,9 @@ class Player {
     translate(this.x, this.y);
     noStroke();
 
-    // HEAD
     fill("#ffd8b1");
     rect(8, 0, 16, 14);
 
-    // HAIR
     if (this.type === "boy") fill("#4a90e2");
     if (this.type === "girl") fill("#ff77b4");
     if (this.type === "unisex") fill("#a066ff");
@@ -38,18 +38,15 @@ class Player {
     rect(4, 4, 6, 6);
     rect(22, 4, 6, 6);
 
-    // EYES
     fill(0);
     rect(12, 6, 2, 2);
     rect(18, 6, 2, 2);
 
-    // BODY / CLOTHES
     if (this.type === "boy") fill("#7ec8e3");
     if (this.type === "girl") fill("#ffb6d9");
     if (this.type === "unisex") fill("#cdb4db");
     rect(6, 14, 20, 14);
 
-    // LEGS
     fill("#444");
     rect(8, 28, 6, 6);
     rect(18, 28, 6, 6);

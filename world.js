@@ -1,8 +1,8 @@
 let buildings = [
-  { name: "Cafe", x: 100, y: 80, w: 160, h: 120, color: "#f7c6c7" },
-  { name: "Bookstore", x: 500, y: 80, w: 180, h: 120, color: "#c6d8ff" },
-  { name: "Grocery", x: 120, y: 380, w: 180, h: 120, color: "#c6f7d0" },
-  { name: "Retail", x: 520, y: 380, w: 160, h: 120, color: "#fbe7c6" },
+  { name: "Pixel Thread", x: 100, y: 80, w: 160, h: 120, color: "#f7c6c7" },
+  { name: "Pixel Pages", x: 500, y: 80, w: 180, h: 120, color: "#c6d8ff" },
+  { name: "Bloom & Pixel", x: 120, y: 380, w: 180, h: 120, color: "#c6f7d0" },
+  { name: "Pixel Coffee", x: 520, y: 380, w: 160, h: 120, color: "#fbe7c6" },
 ];
 
 function drawWorld() {
@@ -67,8 +67,6 @@ function darkenColor(col, amt) {
 }
 
 function checkBuildingEntry(player) {
-  player.nearBuilding = null;
-
   for (let i = 0; i < buildings.length; i++) {
     let b = buildings[i];
 
@@ -85,7 +83,32 @@ function checkBuildingEntry(player) {
       textAlign(CENTER);
       text("Press ENTER", width / 2, height - 20);
 
-      player.nearBuilding = i;
+      if (keyIsDown(ENTER)) {
+        currentLevel = i;
+        startStoreLevel();
+        gameState = "store";
+      }
     }
   }
+}
+function drawSpeechBubble(x, y, message) {
+  push();
+  rectMode(CENTER);
+  textAlign(CENTER, CENTER);
+  textSize(14);
+
+  // Bubble shape
+  fill(255);
+  stroke(0);
+  strokeWeight(2);
+  rect(x, y - 20, textWidth(message) + 20, 40, 10);
+
+  // Triangle pointer
+  triangle(x - 10, y, x + 10, y, x, y + 10);
+
+  // Bubble text
+  noStroke();
+  fill(0);
+  text(message, x, y - 20);
+  pop();
 }

@@ -24,7 +24,7 @@ class IntrusiveSystem {
     for (let t of this.thoughts) {
       fill(255, 200);
       rect(t.x, t.y, 200, 40, 5);
-      fill(10);
+      fill(0);
       text(t.text, t.x + 10, t.y + 20);
     }
   }

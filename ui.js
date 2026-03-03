@@ -83,21 +83,16 @@ function drawCharacterOption(x, y, type, keyLabel) {
 }
 
 function drawFailScreen() {
-  background("#ffd6d6");
-  textAlign(CENTER);
-  textSize(32);
-  fill(0);
-  text("Time's Up!", width / 2, height / 2 - 20);
-  textSize(18);
-  text("Press SPACE to Try Again", width / 2, height / 2 + 20);
-}
+  background("#fff3e6");
+  fill("#ff4d4d");
+  textAlign(CENTER, CENTER);
+  textSize(40);
+  text("Try Again!", width / 2, height / 2 - 20);
 
-function drawSuccessScreen() {
-  background("#d6ffd9");
-  textAlign(CENTER);
-  textSize(32);
-  fill(0);
-  text("All Stores Completed!", width / 2, height / 2 - 20);
-  textSize(18);
-  text("Press SPACE to Return", width / 2, height / 2 + 20);
+  textSize(20);
+  text(
+    "Press SPACE to retry\nyou can only move on until you get it right!",
+    width / 2,
+    height / 2 + 30,
+  );
 }
