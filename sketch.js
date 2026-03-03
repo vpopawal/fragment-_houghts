@@ -26,33 +26,44 @@ function draw() {
 }
 
 function keyPressed() {
+  if (gameState === "world" && (key === "Enter" || keyCode === 13)) {
+    if (player.nearBuilding != null) {
+      currentLevel = player.nearBuilding;
+      startStoreLevel();
+      gameState = "store";
+    }
+  }
+
+  // Start screen
   if (gameState === "start" && key === " ") {
     gameState = "characterSelect";
-  } else if (gameState === "characterSelect") {
+  }
+
+  // Character select
+  else if (gameState === "characterSelect") {
     if (key === "1") {
       selectedCharacter = "boy";
       player.setCharacter("boy");
       gameState = "world";
-    }
-    if (key === "2") {
+    } else if (key === "2") {
       selectedCharacter = "girl";
       player.setCharacter("girl");
       gameState = "world";
-    }
-    if (key === "3") {
+    } else if (key === "3") {
       selectedCharacter = "unisex";
       player.setCharacter("unisex");
       gameState = "world";
-
-      if (gameState === "fail" && key === " ") {
-        gameState = "characterSelect";
-        currentLevel = 0;
-      }
-
-      if (gameState === "success" && key === " ") {
-        gameState = "start";
-        currentLevel = 0;
-      }
     }
+  }
+
+  // Fail screen
+  else if (gameState === "fail" && key === " ") {
+    startStoreLevel();
+    gameState = "store";
+  }
+
+  // Success screen
+  else if (gameState === "success" && key === " ") {
+    gameState = "world";
   }
 }

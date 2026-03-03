@@ -67,6 +67,8 @@ function darkenColor(col, amt) {
 }
 
 function checkBuildingEntry(player) {
+  player.nearBuilding = null;
+
   for (let i = 0; i < buildings.length; i++) {
     let b = buildings[i];
 
@@ -83,11 +85,7 @@ function checkBuildingEntry(player) {
       textAlign(CENTER);
       text("Press ENTER", width / 2, height - 20);
 
-      if (keyIsDown(ENTER)) {
-        currentLevel = i;
-        startStoreLevel();
-        gameState = "store";
-      }
+      player.nearBuilding = i;
     }
   }
 }
