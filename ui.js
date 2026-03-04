@@ -1,39 +1,9 @@
 function drawStartScreen() {
-  background("#fff3e6"); // warm creamy tone
-
-  textAlign(CENTER);
-
-  // shadow
-  fill(0, 40);
-  textSize(60);
-  text("Pixel Land Explorer", width / 2 + 3, 203);
-
-  // main title
-  fill("#5a3e2b");
-  textSize(60);
-  text("Pixel Land Explorer", width / 2, 200);
-
-  // subtitle
-  fill("#7a5c4b");
-  textSize(24);
-  text("Press SPACE to Start", width / 2, 320);
+  image(startimg, 0, 0, width, height);
 }
 
 function drawCharacterSelect() {
-  background("#e6f7ff");
-
-  textAlign(CENTER);
-  textSize(32);
-  fill(0);
-  text("Choose Your Character", width / 2, 100);
-
-  textSize(16);
-  text("Press 1, 2, or 3", width / 2, 140);
-
-  // Draw character options
-  drawCharacterOption(width / 4 - 20, 250, "boy", "1");
-  drawCharacterOption(width / 2 - 20, 250, "girl", "2");
-  drawCharacterOption((3 * width) / 4 - 20, 250, "unisex", "3");
+  image(characterimg, 0, 0, width, height);
 }
 
 function drawCharacterOption(x, y, type, keyLabel) {
@@ -83,16 +53,48 @@ function drawCharacterOption(x, y, type, keyLabel) {
 }
 
 function drawFailScreen() {
-  background("#fff3e6");
-  fill("#ff4d4d");
-  textAlign(CENTER, CENTER);
-  textSize(40);
-  text("Try Again!", width / 2, height / 2 - 20);
+  image(tryagainimg, 0, 0, width, height);
+}
 
-  textSize(20);
+function drawInstructionsPopup() {
+  push();
+
+  // Dark background overlay
+  fill(0, 160);
+  rect(0, 0, width, height);
+
+  // Popup box
+  fill(255);
+  stroke(0);
+  strokeWeight(2);
+  rect(width / 2 - 250, height / 2 - 150, 500, 300, 15);
+
+  // Title
+  fill(0);
+  noStroke();
+  textAlign(CENTER);
+  textSize(28);
+  text("How to Play", width / 2, height / 2 - 110);
+
+  // Instructions
+  textSize(16);
   text(
-    "Press SPACE to retry\nyou can only move on until you get it right!",
+    "• Use arrow keys to move\n\n" +
+      "• Stand at a building door\n" +
+      "• Press ENTER to enter\n\n" +
+      "• Click words in the correct order\n" +
+      "• If you click wrong or time runs out,\n  you must try again!",
     width / 2,
-    height / 2 + 30,
+    height / 2 - 50,
   );
+
+  // X button
+  fill("#ff4d4d");
+  rect(width / 2 + 210, height / 2 - 140, 30, 30, 5);
+
+  fill(255);
+  textSize(18);
+  text("X", width / 2 + 225, height / 2 - 133);
+
+  pop();
 }

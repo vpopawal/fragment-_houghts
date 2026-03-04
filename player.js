@@ -2,15 +2,23 @@ class Player {
   constructor() {
     this.x = 100;
     this.y = 300;
-    this.size = 32;
+    this.size = 64; // increase if your image is bigger
     this.speed = 3;
     this.type = "boy";
-
-    this.nearBuilding = null; // ✅ ADD THIS
+    this.img = null; // make sure this exists
+    this.nearBuilding = null;
   }
 
   setCharacter(type) {
     this.type = type;
+
+    if (type === "boy") {
+      this.img = playerImages[0];
+    } else if (type === "girl") {
+      this.img = playerImages[1];
+    } else if (type === "unisex") {
+      this.img = playerImages[2];
+    }
   }
 
   move() {
@@ -24,33 +32,8 @@ class Player {
   }
 
   display() {
-    push();
-    translate(this.x, this.y);
-    noStroke();
-
-    fill("#ffd8b1");
-    rect(8, 0, 16, 14);
-
-    if (this.type === "boy") fill("#4a90e2");
-    if (this.type === "girl") fill("#ff77b4");
-    if (this.type === "unisex") fill("#a066ff");
-    rect(6, -2, 20, 8);
-    rect(4, 4, 6, 6);
-    rect(22, 4, 6, 6);
-
-    fill(0);
-    rect(12, 6, 2, 2);
-    rect(18, 6, 2, 2);
-
-    if (this.type === "boy") fill("#7ec8e3");
-    if (this.type === "girl") fill("#ffb6d9");
-    if (this.type === "unisex") fill("#cdb4db");
-    rect(6, 14, 20, 14);
-
-    fill("#444");
-    rect(8, 28, 6, 6);
-    rect(18, 28, 6, 6);
-
-    pop();
+    if (this.img) {
+      image(this.img, this.x, this.y, this.size, this.size);
+    }
   }
 }

@@ -1,96 +1,55 @@
 let buildings = [
-  { name: "Pixel Thread", x: 100, y: 80, w: 160, h: 120, color: "#f7c6c7" },
-  { name: "Pixel Pages", x: 500, y: 80, w: 180, h: 120, color: "#c6d8ff" },
-  { name: "Bloom & Pixel", x: 120, y: 380, w: 180, h: 120, color: "#c6f7d0" },
-  { name: "Pixel Coffee", x: 520, y: 380, w: 160, h: 120, color: "#fbe7c6" },
+  { name: "Threads", doorX: 193, doorY: 148 },
+  { name: "Pages", doorX: 622, doorY: 171 },
+  { name: "Flower", doorX: 235, doorY: 508 },
+  { name: "Cafe", doorX: 628, doorY: 519 },
 ];
 
+// Draw the world background
 function drawWorld() {
-  drawGrass();
-  drawPaths();
+  image(worldimg, 0, 0, width, height);
+}
+
+// Check if player is at a building door
+function checkBuildingEntry(player) {
+  player.nearBuilding = null;
+  const doorWidth = 60;
+  const doorHeight = 80;
 
   for (let b of buildings) {
-    drawBuilding(b);
-  }
-}
-
-function drawGrass() {
-  background("#b9fbc0");
-  for (let x = 0; x < width; x += 20) {
-    for (let y = 0; y < height; y += 20) {
-      fill(random(["#b9fbc0", "#a3f7b5", "#caffbf"]));
-      rect(x, y, 20, 20);
+    if (
+      player.x + player.size > b.doorX - 15 &&
+      player.x < b.doorX - 15 + doorWidth &&
+      player.y + player.size > b.doorY - 20 &&
+      player.y < b.doorY - 20 + doorHeight
+    ) {
+      player.nearBuilding = b;
+      break; // only nearest building
     }
   }
 }
-
-function drawPaths() {
-  fill("#e0c097");
-  rect(0, 280, width, 40);
-  rect(width / 2 - 20, 0, 40, height);
-}
-
-function drawBuilding(b) {
-  push();
-
-  // Building base
-  fill(b.color);
-  rect(b.x, b.y, b.w, b.h);
-
-  // Roof
-  fill(darkenColor(b.color, 40));
-  triangle(b.x - 10, b.y, b.x + b.w + 10, b.y, b.x + b.w / 2, b.y - 40);
-
-  // Door
-  fill("#6b4f4f");
-  rect(b.x + b.w / 2 - 15, b.y + b.h - 40, 30, 40);
-
-  // Windows
-  fill("#ffffffaa");
-  rect(b.x + 20, b.y + 30, 30, 30);
-  rect(b.x + b.w - 50, b.y + 30, 30, 30);
-
-  // Sign
-  fill("#fff");
-  rect(b.x + b.w / 2 - 50, b.y - 20, 100, 20);
-  fill(0);
-  textAlign(CENTER, CENTER);
-  textSize(12);
-  text(b.name, b.x + b.w / 2, b.y - 10);
-
-  pop();
-}
-
-function darkenColor(col, amt) {
-  let c = color(col);
-  return color(red(c) - amt, green(c) - amt, blue(c) - amt);
-}
-
+// Check if player is at a building door
 function checkBuildingEntry(player) {
-  for (let i = 0; i < buildings.length; i++) {
-    let b = buildings[i];
+  player.nearBuilding = null;
+  const doorWidth = 60;
+  const doorHeight = 80;
 
-    let doorX = b.x + b.w / 2 - 15;
-    let doorY = b.y + b.h - 40;
+  for (let b of buildings) {
+    let doorX = b.doorX;
+    let doorY = b.doorY;
 
     if (
-      player.x + player.size > doorX &&
-      player.x < doorX + 30 &&
-      player.y + player.size > doorY &&
-      player.y < doorY + 40
+      player.x + player.size > doorX - 15 &&
+      player.x < doorX - 15 + doorWidth &&
+      player.y + player.size > doorY - 20 &&
+      player.y < doorY - 20 + doorHeight
     ) {
-      fill(0);
-      textAlign(CENTER);
-      text("Press ENTER", width / 2, height - 20);
-
-      if (keyIsDown(ENTER)) {
-        currentLevel = i;
-        startStoreLevel();
-        gameState = "store";
-      }
+      player.nearBuilding = b;
+      break;
     }
   }
 }
+
 function drawSpeechBubble(x, y, message) {
   push();
   rectMode(CENTER);

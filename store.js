@@ -103,6 +103,24 @@ function drawStore() {
 }
 
 function mousePressed() {
+  // ⭐ CLOSE INSTRUCTIONS POPUP (ADD THIS FIRST)
+  if (gameState === "world" && showInstructions) {
+    let xLeft = width / 2 + 210;
+    let xRight = xLeft + 30;
+    let yTop = height / 2 - 140;
+    let yBottom = yTop + 30;
+
+    if (
+      mouseX > xLeft &&
+      mouseX < xRight &&
+      mouseY > yTop &&
+      mouseY < yBottom
+    ) {
+      showInstructions = false;
+      return; // IMPORTANT: stop here so nothing else runs
+    }
+  }
+
   if (gameState === "store") {
     let clickedWord = null;
 
