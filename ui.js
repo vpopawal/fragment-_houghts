@@ -98,3 +98,41 @@ function drawInstructionsPopup() {
 
   pop();
 }
+
+function drawLevelSelect() {
+  background("#DEBE91");
+
+  if (levelSelectBackgrounds[currentLevel]) {
+    image(levelSelectBackgrounds[currentLevel], 0, 0, width, height);
+  }
+
+  // DRAW LOCKS
+  for (let i = 0; i < 3; i++) {
+    if (i >= buildingProgress[currentLevel] + 1) {
+      let rect = sublevelRects[i];
+
+      let centerX = (rect.x1 + rect.x2) / 2;
+      let centerY = (rect.y1 + rect.y2) / 2;
+
+      image(lockImg, centerX - 75, centerY - 65, 150, 130);
+    }
+  }
+}
+
+function drawFailScreen() {
+  image(tryagainimg, 0, 0, width, height);
+
+  let btnW = 220;
+  let btnH = 60;
+  let btnX = width / 2;
+  let btnY = height - 120;
+
+  fill(255);
+  rectMode(CENTER);
+  rect(btnX, btnY, btnW, btnH, 10);
+
+  fill(0);
+  textAlign(CENTER, CENTER);
+  textSize(20);
+  text("Return to World", btnX, btnY);
+}

@@ -6,14 +6,13 @@ let characterimg;
 let tryagainimg;
 let playerImages = [];
 let showInstructions = true;
+let levelSelectBackgrounds = [];
+let lockImg;
 
 function setup() {
-  let cnv = createCanvas(800, 600); // store canvas in variable
-  cnv.position(
-    (windowWidth - width) / 2, // center horizontally
-    (windowHeight - height) / 2, // center vertically
-  );
-
+  noStroke();
+  let cnv = createCanvas(800, 600);
+  cnv.position((windowWidth - width) / 2, (windowHeight - height) / 2);
   player = new Player();
   textFont("Patrick Hand");
 }
@@ -23,7 +22,7 @@ function preload() {
   for (let lvl of levels) {
     levelBackgrounds.push(loadImage(lvl.bgImg));
   }
-  worldimg = loadImage("assets/worldbackground.png");
+  worldimg = loadImage("assets/worldBackground.png");
   startimg = loadImage("assets/introImage.png");
   characterimg = loadImage("assets/characterBackground.png");
   tryagainimg = loadImage("assets/tryagainScreen.png");
@@ -31,6 +30,13 @@ function preload() {
   playerImages[0] = loadImage("assets/player1.png");
   playerImages[1] = loadImage("assets/player2.png");
   playerImages[2] = loadImage("assets/player3.png");
+
+  levelSelectBackgrounds.push(loadImage("assets/clothinglevels.png"));
+  levelSelectBackgrounds.push(loadImage("assets/booklevels.png"));
+  levelSelectBackgrounds.push(loadImage("assets/flowerlevels.png"));
+  levelSelectBackgrounds.push(loadImage("assets/coffeelevels.png"));
+
+  lockImg = loadImage("assets/pixel_lock.png");
 }
 
 function draw() {
@@ -46,15 +52,31 @@ function draw() {
     fill(0);
     textSize(16);
     textAlign(LEFT, TOP);
+    noStroke();
     text(`X: ${Math.floor(player.x)}  Y: ${Math.floor(player.y)}`, 10, 10);
     checkBuildingEntry(player);
 
     // Show Press ENTER if near building
     if (player.nearBuilding) {
-      fill(0);
-      textAlign(CENTER);
+      textAlign(CENTER, CENTER);
       textSize(18);
-      text("Press ENTER", width / 2, height - 40);
+
+      let message = "Press ENTER";
+      let paddingX = 20; // horizontal padding
+      let paddingY = 10; // vertical padding
+
+      // Get text width and height
+      let boxWidth = textWidth(message) + paddingX * 2;
+      let boxHeight = 18 + paddingY * 2; // 18 is textSize
+
+      // Draw white rectangle behind the text
+      fill(255); // white
+      rectMode(CENTER);
+      rect(width / 2, height - 40, boxWidth, boxHeight, 5); // last parameter is corner rounding
+
+      // Draw the text on top
+      fill(0); // black text
+      text(message, width / 2, height - 40);
     }
 
     if (showInstructions) {
@@ -64,6 +86,9 @@ function draw() {
     drawStore();
   } else if (gameState === "fail") {
     drawFailScreen();
+  } else if (gameState === "levelSelect") {
+    drawLevelSelect();
+    text(`X: ${Math.floor(mouseX)}  Y: ${Math.floor(mouseY)}`, 55, 15);
   }
 }
 
@@ -90,14 +115,10 @@ function keyPressed() {
       player.setCharacter("unisex");
       gameState = "world";
     }
-  }
-
-  // Enter to go into building
-  else if (gameState === "world") {
+  } else if (gameState === "world") {
     if (keyCode === ENTER && player.nearBuilding) {
-      currentLevel = buildings.indexOf(player.nearBuilding);
-      startStoreLevel();
-      gameState = "store";
+      currentLevel = player.nearBuilding.levelIndex;
+      gameState = "levelSelect";
     }
   }
 
@@ -107,6 +128,10 @@ function keyPressed() {
       startStoreLevel();
       gameState = "store";
     } else if (keyCode === ENTER) {
+      gameState = "world";
+    }
+  } else if (gameState === "success") {
+    if (key === " " || keyCode === ENTER) {
       gameState = "world";
     }
   }

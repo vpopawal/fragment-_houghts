@@ -22,10 +22,16 @@ class IntrusiveSystem {
 
   display() {
     for (let t of this.thoughts) {
+      // Draw the rectangle
       fill(255, 200);
-      rect(t.x, t.y, 200, 40, 5);
+      rectMode(CENTER);
+      rect(t.x, t.y, 250, 40, 5);
+
+      // Draw the text centered
       fill(0);
-      text(t.text, t.x + 10, t.y + 20);
+      textAlign(CENTER, CENTER); // Center horizontally and vertically
+      textSize(16); // adjust size as needed
+      text(t.text, t.x, t.y);
     }
   }
 

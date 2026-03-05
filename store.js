@@ -3,11 +3,21 @@ let arranged = [];
 let timer = 20;
 let intrusiveSystem;
 
-function startStoreLevel() {
-  let correctSentence = levels[currentLevel].sentence.split(" ");
+let sublevelRects = [
+  { x1: 130, x2: 280, y1: 230, y2: 400 },
+  { x1: 325, x2: 475, y1: 230, y2: 400 },
+  { x1: 520, x2: 670, y1: 230, y2: 400 },
+];
 
-  // Add confusing words
-  let distractors = [
+// ------------------
+// START LEVEL
+// ------------------
+function startStoreLevel() {
+  let levelData = levels[currentLevel].subLevels[currentSubLevel];
+
+  let correctSentence = levelData.sentence.split(" ");
+
+  let distractorPool = [
     "maybe",
     "oops",
     "forgot",
@@ -16,15 +26,18 @@ function startStoreLevel() {
     "uh",
     "actually",
     "wait",
+    "hmm",
+    "like",
+    "what",
+    "okay",
   ];
 
-  // Mix correct words + distractors
-  let mixed = correctSentence.concat(shuffle(distractors).slice(0, 4));
+  let distractors = shuffle(distractorPool).slice(0, levelData.distractors);
+
+  let mixed = shuffle(correctSentence.concat(distractors));
 
   words = [];
-
-  // Create floating word objects
-  for (let w of shuffle(mixed)) {
+  for (let w of mixed) {
     words.push({
       text: w,
       x: random(100, width - 100),
@@ -35,104 +48,138 @@ function startStoreLevel() {
   }
 
   arranged = [];
-  timer = 20;
+  timer = levelData.timeLimit;
 
-  intrusiveSystem = new IntrusiveSystem(levels[currentLevel].intrusiveRate);
+  intrusiveSystem = new IntrusiveSystem(levelData.intrusiveRate);
 }
 
+// ------------------
+// DRAW STORE SCREEN
+// ------------------
 function drawStore() {
+  if (!levels || !levels[currentLevel]) return;
+
+  let levelData = levels[currentLevel].subLevels[currentSubLevel];
+
+  // Background
   if (levelBackgrounds[currentLevel]) {
     image(levelBackgrounds[currentLevel], 0, 0, width, height);
   } else {
-    background("#fff3e6"); // fallback color
+    background("#fff3e6");
+  }
+  if (arranged.length === levelData.sentence.split(" ").length) {
+    if (arranged.join(" ") === levelData.sentence) {
+      if (buildingProgress[currentLevel] < 3) {
+        buildingProgress[currentLevel]++;
+      }
+      arranged = [];
+      gameState = "world";
+    }
   }
 
-  // Show the question at the top
-  drawSpeechBubble(width / 2, 50, levels[currentLevel].question);
+  // Speech bubble
+  drawSpeechBubble(width / 2, 50, levelData.question);
+
+  // -------------------
   // TIMER LOGIC
-  if (frameCount % 60 === 0 && timer > 0) {
-    timer--;
-  }
+  // -------------------
+  if (frameCount % 60 === 0 && timer > 0) timer--;
 
-  // TIMER DISPLAY (BIG CIRCLE)
-  let maxTime = levels[currentLevel].timeLimit;
-  let timeRatio = timer / maxTime; // 1 at start → 0 at end
+  if (timer <= 0) gameState = "fail";
 
-  let centerX = 75; // move position if needed
+  // -------------------
+  // TIMER CIRCLE
+  // -------------------
+  let maxTime = levelData.timeLimit;
+  let timeRatio = timer / maxTime;
+
+  let centerX = 75;
   let centerY = 60;
-  let size = 70; // 🔥 bigger circle
+  let size = 70;
 
-  // Background ring (light grey base)
   noStroke();
-  fill(240);
+  fill("#ff4d4d");
   ellipse(centerX, centerY, size);
 
-  // Red countdown fill (FULL at start)
-  fill("#ff4d4d"); // strong red
+  fill(255);
   arc(
     centerX,
     centerY,
     size,
     size,
-    -HALF_PI,
     -HALF_PI + TWO_PI * timeRatio,
+    -HALF_PI + TWO_PI,
     PIE,
   );
 
-  // Inner circle (optional donut style — remove if you want full solid)
   fill(255);
   ellipse(centerX, centerY, size * 0.65);
 
-  // Timer number in center
   fill(0);
   textAlign(CENTER, CENTER);
   textSize(28);
   text(timer, centerX, centerY);
 
-  // UPDATE & DRAW FLOATING WORDS
+  // -------------------
+  // WORDS
+  // -------------------
   for (let w of words) {
     w.x += w.vx;
     w.y += w.vy;
 
     if (w.x < 50 || w.x > width - 50) w.vx *= -1;
-    if (w.y < 100 || w.y > height - 100) w.vy *= -1;
+    if (w.y < 150 || w.y > height - 120) w.vy *= -1;
 
+    // Bubble
     fill("#d0f4ff");
-    rect(w.x - 40, w.y - 20, 80, 40, 8);
+    stroke(0);
+    rectMode(CENTER);
+    rect(w.x, w.y, 80, 40, 8);
 
+    // Text
     fill(0);
+    noStroke();
     textAlign(CENTER, CENTER);
     textSize(14);
     text(w.text, w.x, w.y);
   }
 
-  // DRAW ARRANGED SENTENCE AREA
-  fill("#baffc9");
-  rect(50, height - 100, width - 100, 60, 10);
+  // -------------------
+  // ARRANGED SENTENCE
+  // -------------------
+  fill("#ffffff");
+  rect(width / 2, height - 100, width - 40, 60, 10);
 
   fill(0);
   textAlign(LEFT, CENTER);
   textSize(16);
+  text(arranged.join(" "), 60, height - 100);
 
-  let sentenceString = arranged.join(" ");
-  text(sentenceString, 60, height - 70);
-
-  // CHECK WIN CONDITION
-  if (arranged.join(" ") === levels[currentLevel].sentence) {
-    gameState = "world"; // return to world when complete
+  // -------------------
+  // WIN CONDITION
+  // -------------------
+  if (arranged.length === levelData.sentence.split(" ").length) {
+    if (arranged.join(" ") === levelData.sentence) {
+      gameState = "world";
+    }
   }
 
-  // If time runs out
-  if (timer <= 0) {
-    gameState = "fail"; // go to your fail screen
+  // -------------------
+  // INTRUSIVE SYSTEM
+  // -------------------
+  if (intrusiveSystem) {
+    intrusiveSystem.update();
+    intrusiveSystem.display();
   }
 
-  intrusiveSystem.update();
-  intrusiveSystem.display();
+  drawExitButton();
 }
 
+// ------------------
+// MOUSE PRESS
+// ------------------
 function mousePressed() {
-  // ⭐ CLOSE INSTRUCTIONS POPUP (ADD THIS FIRST)
+  // Close instructions first
   if (gameState === "world" && showInstructions) {
     let xLeft = width / 2 + 210;
     let xRight = xLeft + 30;
@@ -146,19 +193,35 @@ function mousePressed() {
       mouseY < yBottom
     ) {
       showInstructions = false;
-      return; // IMPORTANT: stop here so nothing else runs
+      return;
+    }
+  }
+
+  // STORE EXIT BUTTON
+  if (gameState === "store") {
+    let btnSize = 50;
+    let x = width - btnSize - 40;
+    let y = 20;
+
+    if (
+      mouseX > x &&
+      mouseX < x + btnSize &&
+      mouseY > y &&
+      mouseY < y + btnSize
+    ) {
+      gameState = "levelSelect"; // goes back to level screen
+      return;
     }
   }
 
   if (gameState === "store") {
     let clickedWord = null;
 
-    // Detect clicked word
     for (let i = words.length - 1; i >= 0; i--) {
       let w = words[i];
       if (
-        mouseX > w.x - 40 &&
-        mouseX < w.x + 40 &&
+        mouseX > w.x - 45 &&
+        mouseX < w.x + 45 &&
         mouseY > w.y - 20 &&
         mouseY < w.y + 20
       ) {
@@ -168,55 +231,128 @@ function mousePressed() {
     }
 
     if (clickedWord !== null) {
-      let expectedWord =
-        levels[currentLevel].sentence.split(" ")[arranged.length];
+      let levelData = levels[currentLevel].subLevels[currentSubLevel];
+      let expectedWord = levelData.sentence.split(" ")[arranged.length];
 
       if (clickedWord === expectedWord) {
-        // Correct word, add to arranged
         arranged.push(clickedWord);
         words = words.filter((w) => w.text !== clickedWord);
       } else {
-        // Wrong word clicked, go to fail screen
         gameState = "fail";
       }
     }
 
-    if (intrusiveSystem) {
-      intrusiveSystem.handleClick(mouseX, mouseY);
+    if (intrusiveSystem) intrusiveSystem.handleClick(mouseX, mouseY);
+  }
+
+  if (gameState === "levelSelect") {
+    for (let i = 0; i < sublevelRects.length; i++) {
+      let rect = sublevelRects[i];
+
+      if (
+        mouseX > rect.x1 &&
+        mouseX < rect.x2 &&
+        mouseY > rect.y1 &&
+        mouseY < rect.y2
+      ) {
+        if (i <= buildingProgress[currentLevel]) {
+          currentSubLevel = i;
+          startStoreLevel();
+          gameState = "store";
+        }
+
+        return;
+      }
+    }
+
+    // Back button
+    if (mouseX > 58 && mouseX < 182 && mouseY > 530 && mouseY < 575) {
+      gameState = "world";
+    }
+  }
+  // -------------------------
+  // FAIL SCREEN BUTTON
+  // -------------------------
+  if (gameState === "fail") {
+    let btnW = 220;
+    let btnH = 60;
+    let btnX = width / 2;
+    let btnY = height - 120;
+
+    if (
+      mouseX > btnX - btnW / 2 &&
+      mouseX < btnX + btnW / 2 &&
+      mouseY > btnY - btnH / 2 &&
+      mouseY < btnY + btnH / 2
+    ) {
+      gameState = "world";
+      return;
     }
   }
 }
 
+// ------------------
+// SPEECH BUBBLE
+// ------------------
 function drawSpeechBubble(x, y, message) {
   push();
+
   textAlign(CENTER, CENTER);
   textSize(16);
 
-  let offsetY = 100; // proper position
-
-  let bubbleWidth = textWidth(message) + 30;
-  let bubbleHeight = 50;
+  let bubbleWidth = textWidth(message) + 40;
+  let bubbleHeight = 60;
+  let bubbleY = y + 80;
 
   // Bubble
   fill(255);
   stroke(0);
   rectMode(CENTER);
-  rect(x, y + offsetY, bubbleWidth, bubbleHeight, 12);
+  rect(x, bubbleY, bubbleWidth, bubbleHeight, 15);
 
-  // Triangle pointer
+  // Pointer
   noStroke();
   triangle(
     x - 15,
-    y + offsetY + bubbleHeight / 2,
+    bubbleY + bubbleHeight / 2,
     x + 15,
-    y + offsetY + bubbleHeight / 2,
+    bubbleY + bubbleHeight / 2,
     x,
-    y + offsetY + bubbleHeight / 2 + 15,
+    bubbleY + bubbleHeight / 2 + 15,
   );
 
   // Text
   fill(0);
-  text(message, x, y + offsetY);
+  text(message, x, bubbleY);
+
+  pop();
+}
+function drawExitButton() {
+  push();
+
+  rectMode(CORNER);
+
+  let btnSize = 50;
+
+  // POSITION OF BUTTON (change these to move it)
+  let x = width - btnSize - 40;
+  let y = 20;
+
+  // red square
+  fill("#ff4d4d");
+  stroke(0);
+  strokeWeight(2);
+  rect(x, y, btnSize, btnSize, 8);
+
+  // white X
+  stroke(255); // THIS WAS MISSING
+  strokeWeight(4);
+
+  let padding = 12;
+
+  line(x + padding, y + padding, x + btnSize - padding, y + btnSize - padding);
+
+  line(x + btnSize - padding, y + padding, x + padding, y + btnSize - padding);
 
   pop();
 }
