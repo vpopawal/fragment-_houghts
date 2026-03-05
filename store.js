@@ -49,16 +49,45 @@ function drawStore() {
 
   // Show the question at the top
   drawSpeechBubble(width / 2, 50, levels[currentLevel].question);
-
-  // TIMER
-  fill(0);
-  textSize(20);
-  textAlign(LEFT);
-  text("Time: " + timer, 20, 30);
-
+  // TIMER LOGIC
   if (frameCount % 60 === 0 && timer > 0) {
     timer--;
   }
+
+  // TIMER DISPLAY (BIG CIRCLE)
+  let maxTime = levels[currentLevel].timeLimit;
+  let timeRatio = timer / maxTime; // 1 at start → 0 at end
+
+  let centerX = 75; // move position if needed
+  let centerY = 60;
+  let size = 70; // 🔥 bigger circle
+
+  // Background ring (light grey base)
+  noStroke();
+  fill(240);
+  ellipse(centerX, centerY, size);
+
+  // Red countdown fill (FULL at start)
+  fill("#ff4d4d"); // strong red
+  arc(
+    centerX,
+    centerY,
+    size,
+    size,
+    -HALF_PI,
+    -HALF_PI + TWO_PI * timeRatio,
+    PIE,
+  );
+
+  // Inner circle (optional donut style — remove if you want full solid)
+  fill(255);
+  ellipse(centerX, centerY, size * 0.65);
+
+  // Timer number in center
+  fill(0);
+  textAlign(CENTER, CENTER);
+  textSize(28);
+  text(timer, centerX, centerY);
 
   // UPDATE & DRAW FLOATING WORDS
   for (let w of words) {
@@ -160,22 +189,34 @@ function mousePressed() {
 
 function drawSpeechBubble(x, y, message) {
   push();
-  rectMode(CENTER);
   textAlign(CENTER, CENTER);
   textSize(16);
 
-  // Bubble shape
+  let offsetY = 100; // proper position
+
+  let bubbleWidth = textWidth(message) + 30;
+  let bubbleHeight = 50;
+
+  // Bubble
   fill(255);
   stroke(0);
-  strokeWeight(2);
-  rect(x, y - 20, textWidth(message) + 20, 40, 10);
+  rectMode(CENTER);
+  rect(x, y + offsetY, bubbleWidth, bubbleHeight, 12);
 
   // Triangle pointer
-  triangle(x - 10, y, x + 10, y, x, y + 10);
-
-  // Bubble text
   noStroke();
+  triangle(
+    x - 15,
+    y + offsetY + bubbleHeight / 2,
+    x + 15,
+    y + offsetY + bubbleHeight / 2,
+    x,
+    y + offsetY + bubbleHeight / 2 + 15,
+  );
+
+  // Text
   fill(0);
-  text(message, x, y - 20);
+  text(message, x, y + offsetY);
+
   pop();
 }

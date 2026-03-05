@@ -8,7 +8,12 @@ let playerImages = [];
 let showInstructions = true;
 
 function setup() {
-  createCanvas(800, 600);
+  let cnv = createCanvas(800, 600); // store canvas in variable
+  cnv.position(
+    (windowWidth - width) / 2, // center horizontally
+    (windowHeight - height) / 2, // center vertically
+  );
+
   player = new Player();
   textFont("Patrick Hand");
 }
@@ -18,7 +23,7 @@ function preload() {
   for (let lvl of levels) {
     levelBackgrounds.push(loadImage(lvl.bgImg));
   }
-  worldimg = loadImage("assets/worldBackground.png");
+  worldimg = loadImage("assets/worldbackground.png");
   startimg = loadImage("assets/introImage.png");
   characterimg = loadImage("assets/characterBackground.png");
   tryagainimg = loadImage("assets/tryagainScreen.png");
